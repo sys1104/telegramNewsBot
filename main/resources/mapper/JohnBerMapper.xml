@@ -11,9 +11,9 @@
 		 WHERE CHAT_ID = #{chatId}
 	</select>
 
-	<insert id="regItem" parameterType="hashmap">
-		INSERT INTO WISH_LIST(CHAT_ID, ITEM_NAME, ITEM_PRICE, URL) 
-		VALUES(#{chatId}, #{itemName}, #{itemPrice}, #{url})
+	<insert id="regNewsKeyword" parameterType="hashmap">
+		INSERT INTO NEWS_KEYWORD(CHAT_ID, KEYWORD) 
+		VALUES(#{chatId}, #{keyWord})
 	</insert>
 	
 	<insert id="regUser" parameterType="String">
@@ -23,41 +23,28 @@
 	<delete id="delUser" parameterType="String">
 		DELETE FROM USER WHERE CHAT_ID = #{chatId}
 	</delete>
+
+
+	<delete id="delNewsKeyword" parameterType="hashmap">
+		DELETE FROM NEWS_KEYWORD WHERE CHAT_ID = #{chatId} AND KEYWORD = #{keyword}
+	</delete>
 	
-	<select id="getPrice" parameterType="map" resultType="Integer">
-		SELECT A.ITEM_PRICE
-		  FROM WISH_LIST A
-		 WHERE A.CHAT_ID = #{chatId}
-		     AND A.ITEM_NAME = #{itemName} 
+	
+	<select id="getNewsKeywordAll" resultType="hashmap">
+		SELECT A.SEQ, A.CHAT_ID, A.KEYWORD
+		  FROM NEWS_KEYWORD A
 	</select>
 
-	<select id="getWishListAll" resultType="hashmap">
-		SELECT A.SEQ, A.CHAT_ID, A.ITEM_NAME, A.ITEM_PRICE, A.URL
-		  FROM WISH_LIST A
-	</select>
-
-	<select id="getWishListCntByID" parameterType="String" resultType="Integer">
+	<select id="getNewsKeywordCountById" parameterType="String" resultType="Integer">
 		SELECT COUNT(*)
-		  FROM WISH_LIST A
+		  FROM NEWS_KEYWORD A
 	     WHERE A.CHAT_ID = #{chatId}
 	</select>
 
-	<select id="getWishListByID" parameterType="String" resultType="hashmap">
-		SELECT A.SEQ, A.CHAT_ID, A.ITEM_NAME, A.ITEM_PRICE, A.URL
-		  FROM WISH_LIST A
+	<select id="getNewsKeywordByID" parameterType="String" resultType="hashmap">
+		SELECT A.SEQ, A.CHAT_ID, A.KEYWORD
+		  FROM NEWS_KEYWORD A
 	    WHERE A.CHAT_ID = #{chatId}
 	</select>
 
-	<update id="updatePrice" parameterType="hashmap">
-	   UPDATE WISH_LIST
-		    SET ITEM_PRICE = #{itemPrice}
-		WHERE CHAT_ID = #{chatId}
-		    AND SEQ = #{seq}
-	</update>
-	
-	<insert id="insertMsgLog" parameterType="hashmap">
-	   INSERT INTO MSG_LOG(CHAT_ID, MSG_CODE, CONTENT, REG_DTIME)
-	   VALUES(#{chatId}, #{msgCode}, #{content}, DATE_FORMAT(now(), '%Y%m%d%H%i%s'))
-	</insert>
-	
 </mapper>

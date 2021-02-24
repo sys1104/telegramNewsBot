@@ -17,7 +17,7 @@ public class BotService {
 	@Autowired
 	private NewsAPIDAO dao;
 
-	final int REG_ITEM_LIMIT = 5;
+	final int REG_KEYWORD_LIMIT = 3;
 	
 	public String getChatId(String chatId) throws SQLException {
 		log.debug("Service.getChatId");
@@ -32,27 +32,23 @@ public class BotService {
 	}
 
 	public int regNewsKeyword(HashMap<String, String> map) throws Exception, SQLException {
-		int regItemCnt = getWishListCntByID(map.get("chatId"));
+		int regNewsKeywordCnt = getNewsKeywordCountById(map.get("chatId"));
 		
-		if (regItemCnt > REG_ITEM_LIMIT) {
-			throw new Exception("상품 등록은 최대 " + String.valueOf(REG_ITEM_LIMIT) + "개 까지만 가능합니다.");
+		if (regNewsKeywordCnt > REG_KEYWORD_LIMIT) {
+			throw new Exception("키워드 등록은 최대 " + String.valueOf(REG_KEYWORD_LIMIT) + "개 까지만 가능합니다.");
 		}
 		return dao.regNewsKeyword(map);
 	}
 
-	public int getPrice(HashMap<String, String> map) throws SQLException {
-		return dao.getPrice(map);
-	}
-
-	public List<HashMap<String, Object>> getAllNews() throws SQLException {
-		return dao.getAllNews();
+	public List<HashMap<String, Object>> getNewsKeywordAll() throws SQLException {
+		return dao.getNewsKeywordAll();
 	}
 	
-	public int getWishListCntByID(String chatId) throws SQLException {
-		return dao.getWishListCntByID(chatId);
+	public int getNewsKeywordCountById(String chatId) throws SQLException {
+		return dao.getNewsKeywordCountById(chatId);
 	}
 	
-	public List<HashMap<String, Object>> getWishListByID(String chatId) throws SQLException {
+	public List<HashMap<String, Object>> getNewsKeywordByID(String chatId) throws SQLException {
 		return dao.getNewsKeywordByID(chatId);
 	}
 	

@@ -87,9 +87,9 @@ public class NewsAPIController {
 		List<HashMap<String, Object>> itemList = new ArrayList<HashMap<String, Object>>();
 		try {
 			if ("".equals(paramChatId)) {
-				itemList = service.getAllNews();
+				itemList = service.getNewsKeywordAll();
 			} else {
-				itemList = service.getWishListByID(paramChatId);
+				itemList = service.getNewsKeywordByID(paramChatId);
 			}
 			log.info(itemList.size() +  "건 ");
 		} catch (SQLException e) {
@@ -109,9 +109,9 @@ public class NewsAPIController {
 		
 		try {
 			if ( chatId == null || "".equals(chatId)) {
-				wishList = service.getAllNews();
+				wishList = service.getNewsKeywordAll();
 			} else {
-				wishList = service.getWishListByID(chatId);
+				wishList = service.getNewsKeywordByID(chatId);
 			}
 			updateList = service.getUpdateList(wishList);
 			log.info( "업데이트 대상 리스트 : " + updateList.size() +  "건 " );

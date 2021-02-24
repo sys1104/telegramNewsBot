@@ -11,12 +11,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface NewsAPIDAO {
 	String getChatId(String chatId);
+		
+	List<HashMap<String, Object>> getNewsKeywordAll();
 	
-	int getPrice(HashMap<String, String> map);
-	
-	List<HashMap<String, Object>> getAllNews();
-	
-	int getWishListCntByID(String chatId);
+	int getNewsKeywordCountById(String chatId);
 	
 	List<HashMap<String, Object>> getNewsKeywordByID(String chatId);
 	

@@ -27,15 +27,15 @@ import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
-import com.song.crawler.NaverCrawler;
 import com.song.utils.CommonUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-public class JohnberBotListener extends TelegramLongPollingBot {
+public class BotListener extends TelegramLongPollingBot {
 	private String chatId;
+	
     @Override
     public void onUpdateReceived(Update arg0) {
         // TODO
@@ -127,23 +127,7 @@ public class JohnberBotListener extends TelegramLongPollingBot {
         		sendMessage("사용자 등록 후 상품 등록 가능합니다.");
         	} else {
         		try {
-	            	Map<String, Object> itemInfoMap = new HashMap<>();
-	            	NaverCrawler naverCrawler = new NaverCrawler();
-	            	String url = message;
-                	itemInfoMap = naverCrawler.getItemInfoMap(url);
-                	if (itemInfoMap.size() > 0) {
-                    	String itemPrice = itemInfoMap.get("itemPrice").toString();
-                    	itemPrice = itemPrice.replace(",","");
-                    	itemInfoMap.remove("itemPrice");
-                    	itemInfoMap.put("itemPrice", itemPrice);
-                    	itemInfoMap.put("chatId", this.chatId);
-                    	itemInfoMap.put("url", url);
-                    	String itemName = itemInfoMap.get("itemName").toString();
-    					sendPostMap(itemInfoMap, "/regItem");
-    					sendMessage("다음과 같은 상품이 등록되었습니다. \n" + "상품명 : " + itemName + "\n최저가 : " + CommonUtils.addMoneyComma(itemPrice));
-                	} else {
-                		sendMessage("상품정보 조회에 실패했습니다.");
-                	}          	         		
+         	         		
             	} catch (IllegalArgumentException iae) {
             		sendMessage(iae.getMessage());
             		log.error( "URL = " + message + "에러메시지 : " + iae.getMessage());
@@ -246,12 +230,12 @@ public class JohnberBotListener extends TelegramLongPollingBot {
     public String sendMessage(String message) {
     	TelegramBot bot = new TelegramBot(getBotToken());
 
-    	InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(
-    	        new InlineKeyboardButton[] {
-    	                new InlineKeyboardButton("test1").url("www.google.com"),
-    	                new InlineKeyboardButton("test2").callbackData("callback_data"),
-    	                new InlineKeyboardButton("test3!").switchInlineQuery("switch_inline_query")
-    	        });    	
+//    	InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(
+//    	        new InlineKeyboardButton[] {
+//    	                new InlineKeyboardButton("test1").url("www.google.com"),
+//    	                new InlineKeyboardButton("test2").callbackData("callback_data"),
+//    	                new InlineKeyboardButton("test3!").switchInlineQuery("switch_inline_query")
+//    	        });    	
 
     	Keyboard keyboard = new ReplyKeyboardMarkup(
     	        new KeyboardButton[] {
@@ -272,7 +256,7 @@ public class JohnberBotListener extends TelegramLongPollingBot {
     	SendResponse sendResponse = bot.execute(request);
     	boolean ok = sendResponse.isOk();
     	Message responseMessage = sendResponse.message();
-    	//log.debug( "responseMessage : " + responseMessage);
+    	log.debug( "responseMessage : " + responseMessage);
     	
     	return String.valueOf(ok);
     }

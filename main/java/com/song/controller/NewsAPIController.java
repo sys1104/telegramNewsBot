@@ -14,18 +14,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
-import com.song.dao.JohnBerDao;
-import com.song.service.JohnBerBotService;
+import com.song.dao.NewsAPIDAO;
+import com.song.service.BotService;
 
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @Slf4j
-public class CrawlingController {
+public class NewsAPIController {
 	@Autowired
-	JohnBerDao dao;
+	NewsAPIDAO dao;
 	@Autowired
-	JohnBerBotService service;
+	BotService service;
 	
 	@RequestMapping("/getChatId")
 	
@@ -69,7 +69,7 @@ public class CrawlingController {
 		int result = -1;
 		String rtnMsg = "";
 		try {
-			result = service.regItem(paramMap);
+			result = service.regNewsKeyword(paramMap);
 			log.info(result +  "건 등록완료" );
 			rtnMsg = result + "건 등록완료";
 		} catch (Exception e) {
@@ -87,7 +87,7 @@ public class CrawlingController {
 		List<HashMap<String, Object>> itemList = new ArrayList<HashMap<String, Object>>();
 		try {
 			if ("".equals(paramChatId)) {
-				itemList = service.getWishListAll();
+				itemList = service.getAllNews();
 			} else {
 				itemList = service.getWishListByID(paramChatId);
 			}
@@ -109,7 +109,7 @@ public class CrawlingController {
 		
 		try {
 			if ( chatId == null || "".equals(chatId)) {
-				wishList = service.getWishListAll();
+				wishList = service.getAllNews();
 			} else {
 				wishList = service.getWishListByID(chatId);
 			}
@@ -119,7 +119,7 @@ public class CrawlingController {
 				log.info("가격 변동 상품 없음");
 			} else {
 				for (HashMap<String, Object> map : updateList) {
-					log.info(service.updatePrice(map) + "건 업데이트 완료");
+//					log.info(service.updatePrice(map) + "건 업데이트 완료");
 				}
 			}
 		} catch (SQLException e) {

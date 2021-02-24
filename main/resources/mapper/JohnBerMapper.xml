@@ -39,7 +39,7 @@
 	<select id="getWishListCntByID" parameterType="String" resultType="Integer">
 		SELECT COUNT(*)
 		  FROM WISH_LIST A
-	    WHERE A.CHAT_ID = #{chatId}
+	     WHERE A.CHAT_ID = #{chatId}
 	</select>
 
 	<select id="getWishListByID" parameterType="String" resultType="hashmap">

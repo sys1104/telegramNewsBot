@@ -9,7 +9,7 @@ import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
-import com.song.controller.JohnberBotListener;
+import com.song.controller.BotListener;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,11 +25,10 @@ public class SpringWebServiceApplication {
 	public static void main(String[] args) {
 	    ApiContextInitializer.init();
 	    TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
-	    JohnberBotListener bot =  new JohnberBotListener();	    
+	    BotListener bot =  new BotListener();
 	    
         try {
-            telegramBotsApi.registerBot(bot);
-            
+            telegramBotsApi.registerBot(bot);           
         } catch (TelegramApiException e) {
             log.error(e.toString());
         }

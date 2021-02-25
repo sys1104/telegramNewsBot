@@ -13,7 +13,7 @@
 
 	<insert id="regNewsKeyword" parameterType="hashmap">
 		INSERT INTO NEWS_KEYWORD(CHAT_ID, KEYWORD) 
-		VALUES(#{chatId}, #{keyWord})
+		VALUES(#{chatId}, #{keyword})
 	</insert>
 	
 	<insert id="regUser" parameterType="String">

@@ -4,10 +4,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
 import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import com.song.dao.NewsAPIDAO;
+import com.song.exception.RegLimitOverException;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Transactional
@@ -31,11 +36,11 @@ public class BotService {
 		return dao.delUser(chatId);
 	}
 
-	public int regNewsKeyword(HashMap<String, String> map) throws Exception, SQLException {
+	public int regNewsKeyword(HashMap<String, String> map) throws RegLimitOverException, SQLException, Exception {
 		int regNewsKeywordCnt = getNewsKeywordCountById(map.get("chatId"));
 		
 		if (regNewsKeywordCnt > REG_KEYWORD_LIMIT) {
-			throw new Exception("키워드 등록은 최대 " + String.valueOf(REG_KEYWORD_LIMIT) + "개 까지만 가능합니다.");
+			throw new RegLimitOverException("키워드 등록은 최대 " + String.valueOf(REG_KEYWORD_LIMIT) + "개 까지만 가능합니다.");
 		}
 		return dao.regNewsKeyword(map);
 	}
@@ -59,22 +64,5 @@ public class BotService {
 
 		return updateList;
 	}
-	
-//	
-//	// 가격변동 시 Update 및 메시지 발송
-//	public int updatePrice(HashMap<String, Object> map) throws SQLException {
-//		StringBuffer sb = new StringBuffer();
-//		String itemPrice = CommonUtils.removeComma(map.get("itemPrice").toString());
-//		String oldPrice = map.get("oldPrice").toString();
-//		String itemName = map.get("itemName").toString();
-//		String url = map.get("url").toString();
-//		sb.append("@@가격변동알림@@" + "\n상품명 : ").append(itemName)
-//		   .append("\n이전가격 : ").append(CommonUtils.addMoneyComma(oldPrice))
-//		   .append("\n현재가격 : ").append(CommonUtils.addMoneyComma(itemPrice))
-//		   .append("\n링크이동 : ").append(CommonUtils.rawUrlToATag(url));
-//		String message = sb.toString();
-//		sendMessage(message, map.get("chatId").toString());
-//		return dao.updatePrice(map);
-//	}
 
 }

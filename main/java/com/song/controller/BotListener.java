@@ -19,15 +19,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
-import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.model.request.Keyboard;
 import com.pengrad.telegrambot.model.request.KeyboardButton;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
-import com.song.utils.CommonUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -60,16 +57,16 @@ public class BotListener extends TelegramLongPollingBot {
         	sendMessage(hello.append(command).toString());
         } else if ("/사용법".equals(message)) {
         	sendMessage("사용자 등록 후 네이버 쇼핑의 특정상품 URL을 입력하면 자동으로 원하는 상품이 등록됩니다.");
-        } else if ("/등록".equals(message)) {
+        } else if ("/가입".equals(message)) {
     			if (isRegistered()) {
-    				sendMessage("이미 등록된 사용자입니다.");
+    				sendMessage("이미 가입된 사용자입니다.");
     			} else {
     				try {
     					sendPost(chatId, "/regUser");
     				} catch (Exception e) {
     					log.debug(e.toString());
     				}
-    				sendMessage("사용자 등록완료되었습니다.");
+    				sendMessage("가입완료되었습니다.");
     			}
         } else if ("/탈퇴".equals(message)) {
     		try {
@@ -82,31 +79,24 @@ public class BotListener extends TelegramLongPollingBot {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-        } else if ("/상품목록".equals(message)) {
+        } else if ("/키워드목록".equals(message)) {
         	try {
 				StringBuffer sb = new StringBuffer();
-				String tagUrl = "";
-				String itemPrice = "";
+				String newsKeyword = "";
 				
-				String wishListJson = sendPost(chatId, "/getWishList");
+				String newsKeywordListJson = sendPost(chatId, "/getNewsKeyword");
 				
-				if (wishListJson.length() <= 0) {
-					sb.append("등록된 상품이 없습니다");
+				if (newsKeywordListJson.length() <= 0) {
+					sb.append("등록된 키워드가 없습니다");
 				} else {
 					JsonParser jsonParser = new JsonParser();
-					JsonArray jsonArray = (JsonArray) jsonParser.parse(wishListJson);
-					sb.append("등록된 상품은 다음과 같습니다\n\n\n");
+					JsonArray jsonArray = (JsonArray) jsonParser.parse(newsKeywordListJson);
+					sb.append("등록된 키워드는 다음과 같습니다\n\n\n");
 					
 					for ( int i = 0; i < jsonArray.size(); i++) {
 						JsonObject jo = (JsonObject) jsonArray.get(i);
-						itemPrice = CommonUtils.addMoneyComma(jo.get("ITEM_PRICE").getAsString());
-						tagUrl = CommonUtils.rawUrlToATag(jo.get("URL").getAsString());
-						//NPE발생
-						//sb.append("상품코드").append(jo.get("SEQ").getAsString()).append("\n");
-						sb.append("상품명 : ").append(jo.get("ITEM_NAME").getAsString()).append("\n");
-						sb.append("가격 : ").append(itemPrice).append("\n");
-						sb.append("URL : ").append(tagUrl).append("\n");
-						sb.append("=====================================\n");
+						newsKeyword = jo.get("ITEM_PRICE").getAsString();
+						sb.append(newsKeyword).append("\n");
 					}
 				}
 
@@ -116,18 +106,21 @@ public class BotListener extends TelegramLongPollingBot {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-        } else if ("/가격갱신".equals(message)) {
-        	try {
-        		sendPost(chatId, "/updatePrice");
-        	} catch (Exception e) {
-        		log.error(e.toString());
-        	}
-        } else if (message.startsWith("http")) {
+        } else if (message.startsWith("/등록")) {
         	if ( !isRegistered() ) {
         		sendMessage("사용자 등록 후 상품 등록 가능합니다.");
         	} else {
         		try {
-         	         		
+        			Map<String, Object> paramMap = new HashMap<>();
+        			paramMap.put("chatId", this.chatId);
+        			message = message.replaceAll("/등록", "");
+        			message = message.replaceAll(" ", "");
+        			paramMap.put("keyword", message);
+        			
+        			String rtnMsg = sendPostMap(paramMap, "/regNewsKeyword"); 
+					
+        			sendMessage(rtnMsg);
+        			
             	} catch (IllegalArgumentException iae) {
             		sendMessage(iae.getMessage());
             		log.error( "URL = " + message + "에러메시지 : " + iae.getMessage());
@@ -189,19 +182,18 @@ public class BotListener extends TelegramLongPollingBot {
         in.close();
         return rtnData;
     }
-    public String sendPostMap(Map<String, Object> itemInfoMap, String method) throws Exception {
+    public String sendPostMap(Map<String, Object> paramMap, String method) throws Exception {
     	String rtnData = "";
     	String baseURL = "http://localhost:8080";
     	String URLMethod = method;
         URL url = new URL(baseURL.concat(URLMethod)); // API 호출 url + method
-        Map<String,Object> params = new LinkedHashMap<>(); // 파라미터 세팅
-        params.put("chatId", itemInfoMap.get("chatId"));
-        params.put("itemName", itemInfoMap.get("itemName"));
-        params.put("itemPrice", itemInfoMap.get("itemPrice"));
-        params.put("url", itemInfoMap.get("url"));
+//        Map<String,Object> params = new LinkedHashMap<>(); // 파라미터 세팅
+//        params.put("chatId", paramMap.get("chatId"));
+//        params.put("keywords", paramMap.get("keywords"));
+
  
         StringBuilder postData = new StringBuilder();
-        for(Map.Entry<String,Object> param : params.entrySet()) {
+        for(Map.Entry<String,Object> param : paramMap.entrySet()) {
             if(postData.length() != 0) postData.append('&');
             postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
             postData.append('=');

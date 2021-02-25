@@ -65,6 +65,24 @@ public class NewsAPIController {
 			e.printStackTrace();
 		}
 	}
+	@RequestMapping("/delNewsKeyword")
+	public String delNewsKeyword(@RequestParam HashMap<String, String> paramMap) {
+		int result = -1;
+		String rtnMsg = "";
+		try {
+			result = service.delNewsKeyword(paramMap);
+			log.info(result +  "건 삭제완료" );
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if (result > 0) {
+			rtnMsg = String.valueOf(result) + "건 삭제되었습니다.";
+		} else {
+			rtnMsg = "삭제할 키워드가 없습니다.";
+		}
+		return rtnMsg;
+	}	
 	@RequestMapping("/regNewsKeyword")
 	public String regNewsKeyword(@RequestParam HashMap<String, String> paramMap) {
 		int insertedCnt = 0;

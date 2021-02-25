@@ -42,7 +42,7 @@ public class BotService {
 		int regNewsKeywordCnt = getNewsKeywordCountById(map.get("chatId"));
 		int dupKeywordCnt = duplKeywordCnt(map);
 		
-		if (regNewsKeywordCnt > REG_KEYWORD_LIMIT) {
+		if (regNewsKeywordCnt >= REG_KEYWORD_LIMIT) {
 			throw new RegLimitOverException("키워드 등록은 최대 " + String.valueOf(REG_KEYWORD_LIMIT) + "개 까지만 가능합니다.");
 		}else if(dupKeywordCnt > 0) {
 			throw new RegDupException("이미 등록된 키워드 입니다.");
@@ -50,6 +50,10 @@ public class BotService {
 		return dao.regNewsKeyword(map);
 	}
 
+	public int delNewsKeyword(HashMap<String, String> map) throws RegLimitOverException, SQLException, Exception {
+		return dao.delNewsKeyword(map);
+	}	
+	
 	public List<HashMap<String, Object>> getNewsKeywordAll() throws SQLException {
 		return dao.getNewsKeywordAll();
 	}

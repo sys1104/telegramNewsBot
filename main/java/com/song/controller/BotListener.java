@@ -106,26 +106,33 @@ public class BotListener extends TelegramLongPollingBot {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-        } else if (message.startsWith("/등록")) {
+        } else if (message.startsWith("/등록") || message.startsWith("/삭제")) {
         	if ( !isRegistered() ) {
-        		sendMessage("사용자 등록 후 상품 등록 가능합니다.");
+        		sendMessage("사용자 등록 후 처리가능합니다.");
         	} else {
         		try {
+        			String replaceStr = "";
+        			String targetAPI = "";  
+        			if (message.startsWith("/등록")) {
+        				replaceStr = "/등록";
+        				targetAPI = "/regNewsKeyword"; 
+        			} else if (message.startsWith("/삭제")) {
+        				replaceStr = "/삭제";
+        				targetAPI = "/delNewsKeyword";
+        			}
+        			
         			Map<String, Object> paramMap = new HashMap<>();
         			paramMap.put("chatId", this.chatId);
-        			message = message.replaceAll("/등록", "");
+        			message = message.replaceAll(replaceStr, "");
         			message = message.replaceAll(" ", "");
         			paramMap.put("keyword", message);
         			
-        			String rtnMsg = sendPostMap(paramMap, "/regNewsKeyword"); 
+        			String rtnMsg = sendPostMap(paramMap, targetAPI); 
 					
         			sendMessage(rtnMsg);
         			
-            	} catch (IllegalArgumentException iae) {
-            		sendMessage(iae.getMessage());
-            		log.error( "URL = " + message + "에러메시지 : " + iae.getMessage());
             	} catch (Exception e) {
-            		sendMessage("상품등록 도중 에러가 발생하였습니다. 개발자에게 문의하세요.");
+            		sendMessage("처리 도중 에러가 발생하였습니다. 개발자에게 문의하세요.");
             		log.error(e.toString());
             	}
         	}

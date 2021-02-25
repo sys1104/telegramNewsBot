@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
 import com.song.dao.NewsAPIDAO;
+import com.song.exception.RegDupException;
 import com.song.exception.RegLimitOverException;
 import com.song.service.BotService;
 
@@ -77,6 +78,8 @@ public class NewsAPIController {
 		} catch (RegLimitOverException rloe) {
 			log.error(rloe.toString());
 			rtnMsg = rloe.getMessage();
+		} catch (RegDupException rde) {
+			rtnMsg = rde.getMessage();
 		} catch (Exception e) {
 			log.error(e.toString());
 			rtnMsg = "입력 중 에러가 발생하였습니다.";

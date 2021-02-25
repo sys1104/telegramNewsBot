@@ -16,6 +16,13 @@
 		VALUES(#{chatId}, #{keyword})
 	</insert>
 	
+	<select id="duplKeywordCnt" parameterType="hashmap" resultType="Integer">
+		SELECT count(*)
+		  FROM NEWS_KEYWORD A
+		 WHERE CHAT_ID = #{chatId}
+		   AND KEYWORD = #{keyword}
+	</select>
+	
 	<insert id="regUser" parameterType="String">
 		INSERT INTO USER(CHAT_ID, REG_DATE) VALUES(#{chatId}, DATE_FORMAT(now(), '%Y%m%d'))
 	</insert>

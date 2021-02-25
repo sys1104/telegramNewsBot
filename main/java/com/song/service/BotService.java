@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.transaction.Transactional;
 
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.song.dao.NewsAPIDAO;
+import com.song.exception.RegDupException;
 import com.song.exception.RegLimitOverException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -38,9 +40,12 @@ public class BotService {
 
 	public int regNewsKeyword(HashMap<String, String> map) throws RegLimitOverException, SQLException, Exception {
 		int regNewsKeywordCnt = getNewsKeywordCountById(map.get("chatId"));
+		int dupKeywordCnt = duplKeywordCnt(map);
 		
 		if (regNewsKeywordCnt > REG_KEYWORD_LIMIT) {
 			throw new RegLimitOverException("키워드 등록은 최대 " + String.valueOf(REG_KEYWORD_LIMIT) + "개 까지만 가능합니다.");
+		}else if(dupKeywordCnt > 0) {
+			throw new RegDupException("이미 등록된 키워드 입니다.");
 		}
 		return dao.regNewsKeyword(map);
 	}
@@ -51,6 +56,10 @@ public class BotService {
 	
 	public int getNewsKeywordCountById(String chatId) throws SQLException {
 		return dao.getNewsKeywordCountById(chatId);
+	}
+	
+	public int duplKeywordCnt(HashMap<String, String> paramMap) throws SQLException {
+		return dao.duplKeywordCnt(paramMap);
 	}
 	
 	public List<HashMap<String, Object>> getNewsKeywordByID(String chatId) throws SQLException {

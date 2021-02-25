@@ -25,4 +25,7 @@ public interface NewsAPIDAO {
 	int delUser(String chatId);
 	
 	int delNewsKeyword(HashMap<String, Object> map);
+	
+	int duplKeywordCnt(HashMap<String, String> map);
+	
 }

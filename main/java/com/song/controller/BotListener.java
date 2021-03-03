@@ -148,17 +148,23 @@ public class BotListener extends TelegramLongPollingBot {
 						sb.append("\n");
 						sb.append(" < 키워드 : "+newsKeyword+" > ");
 						sb.append("\n");
-						for (int j = 0; j < ja.size(); j++) {
-							JsonObject jo = (JsonObject) ja.get(j);
-							newsTitle = jo.get("title").getAsString();
-							// [ ] 문자 하이퍼링크를 위한 예약어 -> <>로 치환
-							newsTitle = newsTitle.replace("[", "<");
-							newsTitle = newsTitle.replace("]", ">");
-							newsLink = jo.get("link").getAsString();
-							sb.append("\n");
-							sb.append(j+1 + ". " + "[" + newsTitle + "]").append("(" + newsLink + ")");
-							sb.append("\n");
+						
+						if(ja.size()<=0) {
+							sb.append("오늘은 뉴스가 없습니다.\n");
+						}else {
+							for (int j = 0; j < ja.size(); j++) {
+								JsonObject jo = (JsonObject) ja.get(j);
+								newsTitle = jo.get("title").getAsString();
+								// [ ] 문자 하이퍼링크를 위한 예약어 -> <>로 치환
+								newsTitle = newsTitle.replace("[", "<");
+								newsTitle = newsTitle.replace("]", ">");
+								newsLink = jo.get("link").getAsString();
+								sb.append("\n");
+								sb.append(j+1 + ". " + "[" + newsTitle + "]").append("(" + newsLink + ")");
+								sb.append("\n");
+							}							
 						}
+
 						if (i == jsonArray.size()-1) {
 							sb.append("=================================");
 						}
@@ -216,8 +222,8 @@ public class BotListener extends TelegramLongPollingBot {
     @Override
     public String getBotToken() {
         // TODO
-        return "952633662:AAGDJOld3g9M691pvvMM8ULmF7oRzYhkvR4";
-//        return "1644646592:AAH6hYf1v3iHTa6gwUng_hXrdYXA7vHhJyM";
+//        return "952633662:AAGDJOld3g9M691pvvMM8ULmF7oRzYhkvR4";
+        return "1644646592:AAH6hYf1v3iHTa6gwUng_hXrdYXA7vHhJyM";
     }
     
     public String sendPost(String parameter, String method) throws Exception {

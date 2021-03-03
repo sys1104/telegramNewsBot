@@ -4,19 +4,14 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
-
 import javax.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.song.crawler.NewsCrawler;
 import com.song.dao.NewsAPIDAO;
 import com.song.exception.RegDupException;
 import com.song.exception.RegLimitOverException;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Transactional
@@ -74,7 +69,6 @@ public class BotService {
 	}
 	
 	public String getNewsInfoByID(String chatId) throws SQLException {
-		Gson gson = new Gson();
 		List<HashMap<String, Object>> keywords = dao.getNewsKeywordByID(chatId);
 		JsonArray newsJsonArray = new JsonArray();
 		for (HashMap<String, Object> map : keywords) {
@@ -85,8 +79,7 @@ public class BotService {
 			} catch (NullPointerException npe) {
 				log.error(npe.getMessage());
 				log.error(npe.toString());
-			}
-				catch (IOException ioe) {
+			} catch (IOException ioe) {
 				log.error(ioe.getMessage());
 				log.error(ioe.toString());
 			} catch (Exception e) {
@@ -98,7 +91,6 @@ public class BotService {
 		
 		String newsInfoJson = "";
 		newsInfoJson = newsJsonArray.toString();
-
 		return newsInfoJson;
 	}
 

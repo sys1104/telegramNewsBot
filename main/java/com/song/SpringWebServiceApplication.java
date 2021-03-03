@@ -8,9 +8,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
-
 import com.song.controller.BotListener;
-
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -28,7 +26,7 @@ public class SpringWebServiceApplication {
 	    BotListener bot =  new BotListener();
 	    
         try {
-            telegramBotsApi.registerBot(bot);           
+            telegramBotsApi.registerBot(bot);
         } catch (TelegramApiException e) {
             log.error(e.toString());
         }

@@ -1,16 +1,18 @@
 package com.song.service;
 
+import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.song.crawler.NewsCrawler;
 import com.song.dao.NewsAPIDAO;
 import com.song.exception.RegDupException;
 import com.song.exception.RegLimitOverException;
@@ -23,7 +25,8 @@ import lombok.extern.slf4j.Slf4j;
 public class BotService {
 	@Autowired
 	private NewsAPIDAO dao;
-
+	@Autowired
+	private NewsCrawler newsCrawler;
 	final int REG_KEYWORD_LIMIT = 3;
 	
 	public String getChatId(String chatId) throws SQLException {
@@ -70,12 +73,33 @@ public class BotService {
 		return dao.getNewsKeywordByID(chatId);
 	}
 	
-	// 가격변동 시 Update
-	public List<HashMap<String, Object>> getUpdateList(List<HashMap<String, Object>> wishList) throws SQLException {
+	public String getNewsInfoByID(String chatId) throws SQLException {
+		Gson gson = new Gson();
+		List<HashMap<String, Object>> keywords = dao.getNewsKeywordByID(chatId);
+		JsonArray newsJsonArray = new JsonArray();
+		for (HashMap<String, Object> map : keywords) {
+			String newsKeyword = map.get("KEYWORD").toString();
+			try {
+				JsonArray newsList = newsCrawler.getNewsInfoByKeyword(newsKeyword);
+				newsJsonArray.add(newsList);
+			} catch (NullPointerException npe) {
+				log.error(npe.getMessage());
+				log.error(npe.toString());
+			}
+				catch (IOException ioe) {
+				log.error(ioe.getMessage());
+				log.error(ioe.toString());
+			} catch (Exception e) {
+				log.error(e.getMessage());
+				e.printStackTrace();
+			}
+			
+		}
 		
-		List<HashMap<String, Object>> updateList = new ArrayList<HashMap<String, Object>>();
+		String newsInfoJson = "";
+		newsInfoJson = newsJsonArray.toString();
 
-		return updateList;
+		return newsInfoJson;
 	}
 
 }

@@ -106,7 +106,7 @@ public class NewsAPIController {
 	}
 	@RequestMapping("/getNewsKeyword")
 	//@Cacheable(value="wishList")
-	public String getWishList(HttpServletRequest request) {
+	public String getNewsKeyword(HttpServletRequest request) {
 
 		String paramChatId = request.getParameter("chatId");
 		String newsKeywordJson = "";
@@ -126,5 +126,25 @@ public class NewsAPIController {
 		newsKeywordJson = gson.toJson(newsKeywordList);
 		return newsKeywordJson;
 	}
+	@RequestMapping("/getNewsInfoByID")
+	public String getNewsInfoByID(HttpServletRequest request) {
+
+		String paramChatId = request.getParameter("chatId");
+		String newsKeywordJson = "";
+		
+		try {
+			if ("".equals(paramChatId)) {
+//				newsKeywordJson = service.getNewsKeywordAll();
+			} else {
+				newsKeywordJson = service.getNewsInfoByID(paramChatId);
+			}
+		} catch (SQLException e) {
+			log.error(e.toString());
+		}
+
+		return newsKeywordJson;
+	}	
+	
+	
 	
 }

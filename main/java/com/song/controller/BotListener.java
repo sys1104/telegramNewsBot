@@ -47,19 +47,25 @@ public class BotListener extends TelegramLongPollingBot {
         StringBuffer hello = new StringBuffer("\"안녕하세요 존버봇입니다.\\n \"");
         StringBuffer command = new StringBuffer();
         command.append("@@@명령어 목록@@@\n")
-        			.append("/등록 : 자동으로 사용자 등록\n")
+        			.append("/가입 : 자동으로 사용자 등록\n")
         			.append("/사용법 : 사용방법 안내\n")
-        			.append("/상품목록 : 찜한 상품 목록 보기\n")
-        			.append("/가격갱신 : 가격변동확인(변동없으면 미발송)\n")
+        			.append("/키워드목록 : 등록 키워드 목록 보기\n")
+        			.append("/뉴스보기 : 현재시각 기준으로 등록된 키워드 뉴스 가져오기\n")
         			.append("/탈퇴 : 탈퇴");
         
         if ("/start".equals(message)) {
         	sendMessage(hello.append(command).toString());
         } else if ("/사용법".equals(message)) {
-        	sendMessage("사용자 등록 후 네이버 쇼핑의 특정상품 URL을 입력하면 자동으로 원하는 상품이 등록됩니다.");
+        	sendMessage("뉴스 키워드 등록하시면 매일 아침 뉴스가 발송됩니다.\n"
+        			+ "@@@명령어 목록@@@\n"
+        			+ "/등록 : 키워드 등록, ex) 등록 테슬라\n"
+        			+ "/키워드목록 : 등록 키워드 목록 보기\n"
+        			+ "/삭제 : 등록된 키워드 삭제 ex)/삭제 테슬라\n"
+        			+ "/뉴스보기 : 현재시각으로 등록된 키워드 뉴스를 확인합니다.\n"
+        			+ "/탈퇴 : 탈퇴 시 가입정보와 함께 등록된 키워드가 삭제됩니다.\n");
         } else if ("/가입".equals(message)) {
     			if (isRegistered()) {
-    				sendMessage("이미 가입된 사용자입니다.");
+    				sendMessage("이미 가입되었습니다.");
     			} else {
     				try {
     					sendPost(chatId, "/regUser");
@@ -71,7 +77,7 @@ public class BotListener extends TelegramLongPollingBot {
         } else if ("/탈퇴".equals(message)) {
     		try {
     			if ( !isRegistered() ) {
-    				sendMessage("사용자 정보가 존재하지 않습니다.");
+    				sendMessage("가입되지 않은 사용자입니다.");
     			} else {
     				sendPost(chatId, "/delUser");
     				sendMessage("탈퇴완료되었습니다.");    				
@@ -91,12 +97,52 @@ public class BotListener extends TelegramLongPollingBot {
 				} else {
 					JsonParser jsonParser = new JsonParser();
 					JsonArray jsonArray = (JsonArray) jsonParser.parse(newsKeywordListJson);
-					sb.append("등록된 키워드는 다음과 같습니다\n\n\n");
+					sb.append("등록된 키워드는 아래와 같습니다\n");
 					
 					for ( int i = 0; i < jsonArray.size(); i++) {
 						JsonObject jo = (JsonObject) jsonArray.get(i);
-						newsKeyword = jo.get("ITEM_PRICE").getAsString();
+						newsKeyword = (i+1) + ". " + jo.get("KEYWORD").getAsString();
 						sb.append(newsKeyword).append("\n");
+					}
+				}
+
+				sendMessage(sb.toString());
+				
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        } else if ("/뉴스보기".equals(message)) {
+        	try {
+				StringBuffer sb = new StringBuffer();
+				String newsInfoJson = sendPost(chatId, "/getNewsInfoByID");
+				
+				if (newsInfoJson.length() <= 0) {
+					sb.append("키워드 관련 없습니다");
+				} else {
+					JsonParser jsonParser = new JsonParser();
+					JsonArray jsonArray = (JsonArray) jsonParser.parse(newsInfoJson);
+					sb.append("키워드 관련 뉴스 목록\n");
+					String newsTitle = "";
+					String newsLink = "";
+					
+					for ( int i = 0; i < jsonArray.size(); i++) {
+						JsonArray ja = (JsonArray) jsonArray.get(i);
+						sb.append("=================================");
+						for (int j = 0; j < ja.size(); j++) {
+							JsonObject jo = (JsonObject) ja.get(j);
+							newsTitle = jo.get("title").getAsString();
+							// [ ] 문자 하이퍼링크를 위한 예약어 -> <>로 치환
+							newsTitle = newsTitle.replace("[", "<");
+							newsTitle = newsTitle.replace("]", ">");
+							newsLink = jo.get("link").getAsString();
+							sb.append("\n");
+							sb.append(j+1 + ". " + "[" + newsTitle + "]").append("(" + newsLink + ")");
+							sb.append("\n");
+						}
+						if (i == jsonArray.size()-1) {
+							sb.append("=================================");
+						}
 					}
 				}
 
@@ -238,16 +284,16 @@ public class BotListener extends TelegramLongPollingBot {
 
     	Keyboard keyboard = new ReplyKeyboardMarkup(
     	        new KeyboardButton[] {
-    	                new KeyboardButton("/등록"),
+    	                new KeyboardButton("/가입"),
     	                new KeyboardButton("/사용법"),
-    	                new KeyboardButton("/상품목록"),
-    	                new KeyboardButton("/가격갱신"),
+    	                new KeyboardButton("/키워드목록"),
+    	                new KeyboardButton("/뉴스보기")
     	        }
     	).resizeKeyboard(true);            	
     	
     	
     	SendMessage request = new SendMessage(this.chatId, message)
-    	        .parseMode(ParseMode.HTML)
+    	        .parseMode(ParseMode.Markdown)
     	        .disableWebPagePreview(true)
     	        .disableNotification(false)
     	        .replyMarkup(keyboard);                                 

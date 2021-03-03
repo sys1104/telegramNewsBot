@@ -97,7 +97,13 @@ public class BotListener extends TelegramLongPollingBot {
 				} else {
 					JsonParser jsonParser = new JsonParser();
 					JsonArray jsonArray = (JsonArray) jsonParser.parse(newsKeywordListJson);
-					sb.append("등록된 키워드는 아래와 같습니다\n");
+					
+					if(jsonArray.size()==0) {
+						sb.append("등록된 키워드가 없습니다.\n");
+					}else {
+						sb.append("등록된 키워드는 아래와 같습니다.\n");
+					}
+					
 					
 					for ( int i = 0; i < jsonArray.size(); i++) {
 						JsonObject jo = (JsonObject) jsonArray.get(i);
@@ -120,15 +126,28 @@ public class BotListener extends TelegramLongPollingBot {
 				if (newsInfoJson.length() <= 0) {
 					sb.append("키워드 관련 없습니다");
 				} else {
+
+					String newsKeywordListJson = sendPost(chatId, "/getNewsKeyword");
+					
 					JsonParser jsonParser = new JsonParser();
 					JsonArray jsonArray = (JsonArray) jsonParser.parse(newsInfoJson);
+					
+					JsonArray jsonKeywordArray = (JsonArray) jsonParser.parse(newsKeywordListJson);
+
 					sb.append("키워드 관련 뉴스 목록\n");
 					String newsTitle = "";
 					String newsLink = "";
-					
 					for ( int i = 0; i < jsonArray.size(); i++) {
 						JsonArray ja = (JsonArray) jsonArray.get(i);
+						
+						JsonObject jk = (JsonObject) jsonKeywordArray.get(i);
+						String newsKeyword = jk.get("KEYWORD").getAsString();
+						
 						sb.append("=================================");
+						sb.append("\n");
+						sb.append("\n");
+						sb.append(" < 키워드 : "+newsKeyword+" > ");
+						sb.append("\n");
 						for (int j = 0; j < ja.size(); j++) {
 							JsonObject jo = (JsonObject) ja.get(j);
 							newsTitle = jo.get("title").getAsString();
@@ -198,6 +217,7 @@ public class BotListener extends TelegramLongPollingBot {
     public String getBotToken() {
         // TODO
         return "952633662:AAGDJOld3g9M691pvvMM8ULmF7oRzYhkvR4";
+//        return "1644646592:AAH6hYf1v3iHTa6gwUng_hXrdYXA7vHhJyM";
     }
     
     public String sendPost(String parameter, String method) throws Exception {

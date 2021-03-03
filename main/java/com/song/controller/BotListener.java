@@ -222,8 +222,8 @@ public class BotListener extends TelegramLongPollingBot {
     @Override
     public String getBotToken() {
         // TODO
-//        return "952633662:AAGDJOld3g9M691pvvMM8ULmF7oRzYhkvR4";
-        return "1644646592:AAH6hYf1v3iHTa6gwUng_hXrdYXA7vHhJyM";
+        return "952633662:AAGDJOld3g9M691pvvMM8ULmF7oRzYhkvR4";
+//        return "1644646592:AAH6hYf1v3iHTa6gwUng_hXrdYXA7vHhJyM";
     }
     
     public String sendPost(String parameter, String method) throws Exception {

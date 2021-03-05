@@ -105,12 +105,11 @@ public class NewsAPIController {
 		return rtnMsg;
 	}
 	@RequestMapping("/getNewsKeyword")
-	//@Cacheable(value="wishList")
 	public String getNewsKeyword(HttpServletRequest request) {
 
 		String paramChatId = request.getParameter("chatId");
 		String newsKeywordJson = "";
-		List<HashMap<String, Object>> newsKeywordList = new ArrayList<HashMap<String, Object>>();
+		List<HashMap<String, Object>> newsKeywordList = new ArrayList<>();
 		try {
 			if ("".equals(paramChatId)) {
 				newsKeywordList = service.getNewsKeywordAll();
@@ -126,15 +125,15 @@ public class NewsAPIController {
 		newsKeywordJson = gson.toJson(newsKeywordList);
 		return newsKeywordJson;
 	}
-	@RequestMapping("/getNewsInfoByID")
-	public String getNewsInfoByID(HttpServletRequest request) {
+	@RequestMapping("/getNewsInfo")
+	public String getNewsInfo(HttpServletRequest request) {
 
 		String paramChatId = request.getParameter("chatId");
 		String newsKeywordJson = "";
 		
 		try {
 			if ("".equals(paramChatId)) {
-//				newsKeywordJson = service.getNewsKeywordAll();
+				newsKeywordJson = service.getNewsInfoAllUser();
 			} else {
 				newsKeywordJson = service.getNewsInfoByID(paramChatId);
 			}

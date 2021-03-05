@@ -11,7 +11,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface NewsAPIDAO {
 	String getChatId(String chatId);
-		
+	
+	List<String> getAllChatId();
+	
 	List<HashMap<String, Object>> getNewsKeywordAll();
 	
 	int getNewsKeywordCountById(String chatId);

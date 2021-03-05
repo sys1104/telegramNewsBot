@@ -10,6 +10,11 @@
 		  FROM USER
 		 WHERE CHAT_ID = #{chatId}
 	</select>
+	
+	<select id="getAllChatId" parameterType="String" resultType="String">
+		SELECT CHAT_ID 
+		  FROM USER
+	</select>	
 
 	<insert id="regNewsKeyword" parameterType="hashmap">
 		INSERT INTO NEWS_KEYWORD(CHAT_ID, KEYWORD) 

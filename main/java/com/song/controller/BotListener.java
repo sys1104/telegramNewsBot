@@ -33,7 +33,15 @@ import lombok.extern.slf4j.Slf4j;
 public class BotListener extends TelegramLongPollingBot {
 	private String chatId;
 	
-    @Override
+    public int getChatId() {
+		return Integer.parseInt(this.chatId);
+	}
+
+	public void setChatId(String chatId) {
+		this.chatId = chatId;
+	}
+
+	@Override
     public void onUpdateReceived(Update arg0) {
         // TODO
 //        log.debug(arg0.getMessage().getFrom().getId()); //get ID 는 user id
@@ -41,7 +49,7 @@ public class BotListener extends TelegramLongPollingBot {
         log.debug(arg0.getMessage().getFrom().getFirstName()); //get ID 는 user id
         log.debug(arg0.getMessage().getChatId().toString());  // 채팅방의 ID
         log.info(arg0.getMessage().getText());  // 받은 TEXT
-        this.chatId = String.valueOf(arg0.getMessage().getChatId());
+        setChatId(String.valueOf(arg0.getMessage().getChatId()));
         String message = arg0.getMessage().getText();
         
         StringBuffer hello = new StringBuffer("\"안녕하세요 존버봇입니다.\\n \"");
@@ -55,6 +63,8 @@ public class BotListener extends TelegramLongPollingBot {
         
         if ("/start".equals(message)) {
         	sendMessage(hello.append(command).toString());
+        } else if ("/test".equals(message)) {
+        	sendNewsToAllUser();
         } else if ("/사용법".equals(message)) {
         	sendMessage("뉴스 키워드 등록하시면 매일 아침 뉴스가 발송됩니다.\n"
         			+ "@@@명령어 목록@@@\n"
@@ -62,7 +72,7 @@ public class BotListener extends TelegramLongPollingBot {
         			+ "/키워드목록 : 등록 키워드 목록 보기\n"
         			+ "/삭제 : 등록된 키워드 삭제 ex)/삭제 테슬라\n"
         			+ "/뉴스보기 : 현재시각으로 등록된 키워드 뉴스를 확인합니다.\n"
-        			+ "/탈퇴 : 탈퇴 시 가입정보와 함께 등록된 키워드가 삭제됩니다.\n");
+        			+ "/탈퇴 : 탈퇴 시 더 이상 뉴스를 발송되지 않으며, 등록된 키워드가 삭제됩니다.\n");
         } else if ("/가입".equals(message)) {
     			if (isRegistered()) {
     				sendMessage("이미 가입되었습니다.");
@@ -121,7 +131,7 @@ public class BotListener extends TelegramLongPollingBot {
         } else if ("/뉴스보기".equals(message)) {
         	try {
 				StringBuffer sb = new StringBuffer();
-				String newsInfoJson = sendPost(chatId, "/getNewsInfoByID");
+				String newsInfoJson = sendPost(chatId, "/getNewsInfo");
 				
 				if (newsInfoJson.length() <= 0) {
 					sb.append("키워드 관련 없습니다");
@@ -298,6 +308,7 @@ public class BotListener extends TelegramLongPollingBot {
         in.close();
         return rtnData;
     }
+    
     public String sendMessage(String message) {
     	TelegramBot bot = new TelegramBot(getBotToken());
 
@@ -318,7 +329,7 @@ public class BotListener extends TelegramLongPollingBot {
     	).resizeKeyboard(true);            	
     	
     	
-    	SendMessage request = new SendMessage(this.chatId, message)
+    	SendMessage request = new SendMessage(getChatId(), message)
     	        .parseMode(ParseMode.Markdown)
     	        .disableWebPagePreview(true)
     	        .disableNotification(false)
@@ -326,15 +337,71 @@ public class BotListener extends TelegramLongPollingBot {
 
     	SendResponse sendResponse = bot.execute(request);
     	boolean ok = sendResponse.isOk();
-    	Message responseMessage = sendResponse.message();
-    	log.debug( "responseMessage : " + responseMessage);
+    	if (ok) {
+    		Message responseMessage = sendResponse.message();
+        	log.debug( "responseMessage : " + responseMessage); 		
+    	} else {
+    		log.error("HTTP Status Code : " + sendResponse.errorCode());
+    		log.error("SendMessageFail : " + sendResponse.description());
+    	}
+
     	
     	return String.valueOf(ok);
     }
-    @Scheduled(cron = "0 0 9,19 * * *")
-    public void scheduler() {
+    @Scheduled(cron = "0 0 8,18 * * *")
+    public void sendNewsToAllUser() {
     	try {
-			sendPost("", "/updatePrice");
+			StringBuffer sb = new StringBuffer();
+			String newsInfoJson = sendPost("", "/getNewsInfo");
+			if (newsInfoJson.length() <= 0) {
+				sb.append("키워드 관련 뉴스가 없습니다");
+			} else {
+
+				JsonParser jsonParser = new JsonParser();
+				JsonArray jsonArrayDepth1 = (JsonArray) jsonParser.parse(newsInfoJson);
+				String newsTitle = "";
+				String newsLink = "";
+				String newsKeyword = "";
+				for ( int i = 0; i < jsonArrayDepth1.size(); i++ ) {
+					sb = new StringBuffer();
+					JsonObject jsonObjectDepth2 = (JsonObject) jsonArrayDepth1.get(i);
+					sb.append("키워드 관련 뉴스 목록\n");
+					setChatId(jsonObjectDepth2.get("chatId").getAsString());
+					JsonArray jsonArrayDepth2 = (JsonArray) jsonObjectDepth2.get("newsInfo");
+					for ( int j = 0; j < jsonArrayDepth2.size(); j++ ) {
+						JsonObject jsonObjectDepth3 = (JsonObject) jsonArrayDepth2.get(j);
+						newsKeyword = jsonObjectDepth3.get("keyword").toString();
+						JsonArray jsonArrayDepth3 = (JsonArray) jsonObjectDepth3.get("newsList");
+						sb.append("=================================");
+						sb.append("\n");
+						sb.append("\n");
+						sb.append(" < 키워드 : "+newsKeyword+" > ");
+						sb.append("\n");
+							
+						if(jsonArrayDepth3.size()<=0) {
+							sb.append("오늘은 뉴스가 없습니다.\n");
+						}else {
+							for (int k = 0; k < jsonArrayDepth3.size(); k++) {
+								JsonObject jo = (JsonObject) jsonArrayDepth3.get(k);
+								newsTitle = jo.get("title").getAsString();
+								// [] = 문자 하이퍼링크를 위한 예약어 -> 기사원문에 있는 []문자 ->  <>로 치환
+								newsTitle = newsTitle.replace("[", "<");
+								newsTitle = newsTitle.replace("]", ">");
+								newsLink = jo.get("link").getAsString();
+								sb.append("\n");
+								sb.append(k+1 + ". " + "[" + newsTitle + "]").append("(" + newsLink + ")");
+								sb.append("\n");
+							}							
+						}
+
+						if (j == jsonArrayDepth3.size()-1) {
+							sb.append("=================================");
+						}						
+					}
+					sendMessage(sb.toString());
+				}
+			}
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

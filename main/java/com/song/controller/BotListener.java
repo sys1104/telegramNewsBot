@@ -52,7 +52,7 @@ public class BotListener extends TelegramLongPollingBot {
         setChatId(String.valueOf(arg0.getMessage().getChatId()));
         String message = arg0.getMessage().getText();
         
-        StringBuffer hello = new StringBuffer("\"안녕하세요 존버봇입니다.\\n \"");
+        StringBuffer hello = new StringBuffer("뉴스 키워드 등록하시면 매일 아침 뉴스가 발송됩니다.\n");
         StringBuffer command = new StringBuffer();
         command.append("@@@명령어 목록@@@\n")
         			.append("/가입 : 자동으로 사용자 등록\n")
@@ -201,17 +201,19 @@ public class BotListener extends TelegramLongPollingBot {
         				replaceStr = "/삭제";
         				targetAPI = "/delNewsKeyword";
         			}
-        			
-        			Map<String, Object> paramMap = new HashMap<>();
-        			paramMap.put("chatId", this.chatId);
         			message = message.replaceAll(replaceStr, "");
         			message = message.replaceAll(" ", "");
-        			paramMap.put("keyword", message);
         			
-        			String rtnMsg = sendPostMap(paramMap, targetAPI); 
-					
+        			String rtnMsg = "";
+        			if(message == "") {
+        				rtnMsg = "뉴스 키워드를 입력해주세요.";
+        			} else {
+            			Map<String, Object> paramMap = new HashMap<>();
+            			paramMap.put("chatId", this.chatId);
+            			paramMap.put("keyword", message);
+            			rtnMsg = sendPostMap(paramMap, targetAPI);     				
+        			}
         			sendMessage(rtnMsg);
-        			
             	} catch (Exception e) {
             		sendMessage("처리 도중 에러가 발생하였습니다. 개발자에게 문의하세요.");
             		log.error(e.toString());
@@ -232,7 +234,7 @@ public class BotListener extends TelegramLongPollingBot {
     @Override
     public String getBotToken() {
         // TODO
-        return "952633662:AAGDJOld3g9M691pvvMM8ULmF7oRzYhkvR4";
+        return "1542284558:AAHwYBpAx78ZbV8y8wNucTm66I3MlcVu2OQ";
 //        return "1644646592:AAH6hYf1v3iHTa6gwUng_hXrdYXA7vHhJyM";
     }
     

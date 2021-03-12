@@ -234,7 +234,7 @@ public class BotListener extends TelegramLongPollingBot {
     @Override
     public String getBotToken() {
         // TODO
-        return "1542284558:AAHwYBpAx78ZbV8y8wNucTm66I3MlcVu2OQ";
+        return "1542284558:AAHGGURBKIIP2bkm1byh5oL-irunofY2wB8";
 //        return "1644646592:AAH6hYf1v3iHTa6gwUng_hXrdYXA7vHhJyM";
     }
     

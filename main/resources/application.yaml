@@ -1,5 +1,8 @@
 logging:
-    file: ./log/local
+    file: 
+        path: ./logs
+        max-size : 500MB
+        max-history : 10
     level:
         com:
             song:

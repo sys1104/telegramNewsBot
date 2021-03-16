@@ -62,7 +62,7 @@ public class NewsAPIController {
 			log.info(result +  "건 삭제완료" );
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(e.toString());
 		}
 	}
 	@RequestMapping("/delNewsKeyword")
@@ -74,7 +74,7 @@ public class NewsAPIController {
 			log.info(result +  "건 삭제완료" );
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(e.toString());
 		}
 		if (result > 0) {
 			rtnMsg = String.valueOf(result) + "건 삭제되었습니다.";

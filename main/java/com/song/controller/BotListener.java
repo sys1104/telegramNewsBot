@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.sql.Time;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -32,7 +33,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class BotListener extends TelegramLongPollingBot {
 	private String chatId;
-	
+	final long timeInterval = 30000;
+
     public int getChatId() {
 		return Integer.parseInt(this.chatId);
 	}
@@ -93,27 +95,23 @@ public class BotListener extends TelegramLongPollingBot {
     				sendMessage("탈퇴완료되었습니다.");    				
     			}
 			} catch (Exception e) {
-				e.printStackTrace();
+				log.error(e.toString());
 			}
         } else if ("/키워드목록".equals(message)) {
         	try {
 				StringBuffer sb = new StringBuffer();
 				String newsKeyword = "";
-				
 				String newsKeywordListJson = sendPost(chatId, "/getNewsKeyword");
-				
 				if (newsKeywordListJson.length() <= 0) {
 					sb.append("등록된 키워드가 없습니다");
 				} else {
 					JsonParser jsonParser = new JsonParser();
 					JsonArray jsonArray = (JsonArray) jsonParser.parse(newsKeywordListJson);
-					
 					if(jsonArray.size()==0) {
 						sb.append("등록된 키워드가 없습니다.\n");
 					}else {
 						sb.append("등록된 키워드는 아래와 같습니다.\n");
 					}
-					
 					
 					for ( int i = 0; i < jsonArray.size(); i++) {
 						JsonObject jo = (JsonObject) jsonArray.get(i);
@@ -126,7 +124,7 @@ public class BotListener extends TelegramLongPollingBot {
 				
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.error(e.toString());
 			}
         } else if ("/뉴스보기".equals(message)) {
         	try {
@@ -185,7 +183,7 @@ public class BotListener extends TelegramLongPollingBot {
 				
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.error(e.toString());
 			}
         } else if (message.startsWith("/등록") || message.startsWith("/삭제")) {
         	if ( !isRegistered() ) {
@@ -234,7 +232,7 @@ public class BotListener extends TelegramLongPollingBot {
     @Override
     public String getBotToken() {
         // TODO
-        return "1542284558:AAHGGURBKIIP2bkm1byh5oL-irunofY2wB8";
+        return "1542284558:AAFmR9-XuR0KuRipjS04rB_XnqLOb6l9dqo";
 //        return "1644646592:AAH6hYf1v3iHTa6gwUng_hXrdYXA7vHhJyM";
     }
     
@@ -350,8 +348,9 @@ public class BotListener extends TelegramLongPollingBot {
     	
     	return String.valueOf(ok);
     }
-    @Scheduled(cron = "0 0 8,18 * * *")
+    @Scheduled(cron = "0 0 8,17 * * *")
     public void sendNewsToAllUser() {
+    	
     	try {
 			StringBuffer sb = new StringBuffer();
 			String newsInfoJson = sendPost("", "/getNewsInfo");
@@ -400,13 +399,16 @@ public class BotListener extends TelegramLongPollingBot {
 							sb.append("=================================");
 						}						
 					}
+					//30초 대기 - 텔레그램 API 한도제한 방지
+					Thread.sleep(timeInterval);
+					
 					sendMessage(sb.toString());
 				}
 			}
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(e.toString());
 		}
     }
     public boolean isRegistered() {
@@ -419,7 +421,7 @@ public class BotListener extends TelegramLongPollingBot {
     		}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(e.toString());
 		}
     	return true;
     }

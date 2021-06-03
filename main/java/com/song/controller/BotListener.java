@@ -33,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class BotListener extends TelegramLongPollingBot {
 	private String chatId;
+	private final String botToken = "1805008191:AAGV0vKdAX3YZD-aPyBRPL4-n0I8gCj0mT8";
 	final long timeInterval = 30000;
 
     public int getChatId() {
@@ -220,7 +221,6 @@ public class BotListener extends TelegramLongPollingBot {
         } else {
         	sendMessage("지원하지 않는 명령어입니다.\n" + command.toString());
         }
-        //log.debug(arg0.getMessage().getReplyToMessage().getText());  // bot이 물어 본 받은 TEXT 사용자
     }
 
     @Override
@@ -232,8 +232,7 @@ public class BotListener extends TelegramLongPollingBot {
     @Override
     public String getBotToken() {
         // TODO
-        return "1542284558:AAFmR9-XuR0KuRipjS04rB_XnqLOb6l9dqo";
-//        return "1644646592:AAH6hYf1v3iHTa6gwUng_hXrdYXA7vHhJyM";
+        return this.botToken;
     }
     
     public String sendPost(String parameter, String method) throws Exception {
@@ -267,7 +266,6 @@ public class BotListener extends TelegramLongPollingBot {
         	rtnData = inputLine;
             log.debug(inputLine);
         }
- 
         in.close();
         return rtnData;
     }
@@ -312,13 +310,6 @@ public class BotListener extends TelegramLongPollingBot {
     public String sendMessage(String message) {
     	TelegramBot bot = new TelegramBot(getBotToken());
 
-//    	InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(
-//    	        new InlineKeyboardButton[] {
-//    	                new InlineKeyboardButton("test1").url("www.google.com"),
-//    	                new InlineKeyboardButton("test2").callbackData("callback_data"),
-//    	                new InlineKeyboardButton("test3!").switchInlineQuery("switch_inline_query")
-//    	        });    	
-
     	Keyboard keyboard = new ReplyKeyboardMarkup(
     	        new KeyboardButton[] {
     	                new KeyboardButton("/가입"),
@@ -327,7 +318,6 @@ public class BotListener extends TelegramLongPollingBot {
     	                new KeyboardButton("/뉴스보기")
     	        }
     	).resizeKeyboard(true);            	
-    	
     	
     	SendMessage request = new SendMessage(getChatId(), message)
     	        .parseMode(ParseMode.Markdown)
@@ -344,7 +334,6 @@ public class BotListener extends TelegramLongPollingBot {
     		log.error("HTTP Status Code : " + sendResponse.errorCode());
     		log.error("SendMessageFail : " + sendResponse.description());
     	}
-
     	
     	return String.valueOf(ok);
     }
@@ -378,7 +367,7 @@ public class BotListener extends TelegramLongPollingBot {
 						sb.append("\n");
 						sb.append(" < 키워드 : "+newsKeyword+" > ");
 						sb.append("\n");
-							
+
 						if(jsonArrayDepth3.size()<=0) {
 							sb.append("오늘은 뉴스가 없습니다.\n");
 						}else {
@@ -401,7 +390,6 @@ public class BotListener extends TelegramLongPollingBot {
 					}
 					//30초 대기 - 텔레그램 API 한도제한 방지
 					Thread.sleep(timeInterval);
-					
 					sendMessage(sb.toString());
 				}
 			}

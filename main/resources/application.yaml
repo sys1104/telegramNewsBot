@@ -14,7 +14,7 @@ spring:
         hikari:
             connection-timeout: 60000
             maximum-pool-size: 5
-        password: root
+        password: q1w2e3r4t5
         url: jdbc:mysql://34.82.6.215:3306/DROP_THE_NEWS?useSSL=false&serverTimezone=Asia/Seoul
         username: root
     mvc:

@@ -27,7 +27,7 @@ public class BotService {
 	private NewsAPIDAO dao;
 	@Autowired
 	private NewsCrawler newsCrawler;
-	final int REG_KEYWORD_LIMIT = 5;
+	final int REG_KEYWORD_LIMIT = 15;
 	
 	public String getChatId(String chatId) throws SQLException {
 		log.debug("Service.getChatId");

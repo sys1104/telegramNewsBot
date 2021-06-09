@@ -82,7 +82,7 @@ public class NewsAPIController {
 			rtnMsg = "삭제할 키워드가 없습니다.";
 		}
 		return rtnMsg;
-	}	
+	}
 	@RequestMapping("/regNewsKeyword")
 	public String regNewsKeyword(@RequestParam HashMap<String, String> paramMap) {
 		int insertedCnt = 0;
@@ -142,7 +142,7 @@ public class NewsAPIController {
 		}
 
 		return newsKeywordJson;
-	}	
+	}
 	
 	
 	

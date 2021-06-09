@@ -1,8 +1,5 @@
 package com.song.crawler;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -12,19 +9,22 @@ import org.springframework.stereotype.Service;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class NewsCrawler {
 	
 	public JsonArray getNewsInfoByKeyword(String newsKeyword) throws IOException, Exception {
 		
-		final int MAX_NEWS_COUNT = 5;
+		final int MAX_NEWS_COUNT = 15;
 		final String urlPrefix = "https://news.google.com/rss/search?q=";
 		final String urlSuffix = "+when:1d&hl=ko&gl=KR&ceid=KR:ko";		
 		String url = "";
 
 		url = urlPrefix + newsKeyword + urlSuffix;
 		JsonArray newsJsonArray = new JsonArray();
-		
+
 		try {
 			Document doc = Jsoup.connect(url).get();
 			Elements titles = doc.getElementsByTag("title");
@@ -41,7 +41,7 @@ public class NewsCrawler {
 		} catch (IndexOutOfBoundsException iobe) {
 			return newsJsonArray;
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.toString());
 			throw new Exception("NewsKeywordCrawling 중 알수없는 예외 발생");
 			
 		}
